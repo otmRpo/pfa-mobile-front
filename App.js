@@ -1,22 +1,34 @@
-import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import Login from './App/screens/Login';
-import ProductCreate from './App/screens/ProductCreate';
 import Register from './App/screens/Register';
+import ProductCreate from './App/screens/ProductCreate';
 import Products from './App/screens/products';
-import MyStack from './App/navigations/Navigator'
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
+import Details from './App/screens/details';
+import Productclient from './App/screens/Productclient';
+import Detailsclient from './App/screens/detailsclient';
+
+const Stack = createStackNavigator();
+
+class App extends React.Component {
+  render() {
+    return (
       <NavigationContainer>
-        <MyStack />
-        <Products />
+        <Stack.Navigator>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="ProductCreate" component={ProductCreate} />
+          <Stack.Screen name="Products" component={Products} />
+          <Stack.Screen name="Productclient" component={Productclient} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Details" component={Details} />
+          <Stack.Screen name="Detailsclient" component={Detailsclient} />
+        </Stack.Navigator>
       </NavigationContainer>
-    </View >
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -27,3 +39,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+export default App;

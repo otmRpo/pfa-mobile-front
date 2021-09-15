@@ -4,51 +4,56 @@ import {
     View,
     Text,
     StyleSheet,
+    Image,
     FlatList,
     TouchableOpacity,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // create a component
-const Products = ({ navigation }) => {
-    const [products, setProducts] = useState();
+const Productclient = ({ navigation }) => {
+    const [products, setProducts] = useState([]);
+    const [loginId, setLoginId] = useState(0);
+
+
+
+
+
 
     const getProductData = async () => {
-        fetch('http://192.168.100.200:5000/api/products')
-            .then((response) => response.json())
-            .then((json) => setProducts(json))
-            .catch((error) => console.error(error))
+        try {
+            let login = await AsyncStorage.getItem('login');
+            fetch('http://192.168.100.200:5000/api/products/client/' + login)
+                .then((response) => response.json())
+                .then((json) => setProducts(json))
+                .catch((error) => console.error(error))
+        } catch (e) {
+            // read error
+        }
+
     };
 
-    const delteProduct = (value) => {
-        console.log(value);
-        fetch('http://192.168.100.200:5000/api/products/' + value, {
-            method: 'DELETE',
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(products),
-        })
-            .then((response) => {
-                response.text();
-
-            })
-            .then((result) => console.log(result))
-            .catch((error) => console.log(error));
-        getProductData();
-    };
 
 
     useState(() => {
         getProductData();
     }, []);
 
+
+
+
+
+
     function Item({ item }) {
         return (
             <View style={styles.listItem}>
                 <View style={styles.column}>
-                    <Text style={{ fontWeight: "bold" }}>marque :</Text>
-                    <Text>description :</Text>
+                    <Image
+                        style={styles.tinyLogo}
+                        source={
+                            require('../images/logo.jpg',
+                            )}
+                    />
                 </View>
                 <View style={styles.info}>
                     <Text style={{ fontWeight: "bold" }}>{item.marque}</Text>
@@ -56,11 +61,11 @@ const Products = ({ navigation }) => {
                 </View>
                 <TouchableOpacity
                     onPress={() =>
-                        navigation.navigate('Details', {
+                        navigation.navigate('Detailsclient', {
                             paramKey: item.id,
                         })
                     }
-                    style={{ height: 50, width: 50, justifyContent: "center", alignItems: "center", marginLeft: 0, }}
+                    style={{ height: 50, width: 50, justifyContent: "center", alignItems: "center", marginLeft: 5, }}
                 >
                     <Text style={{
                         color: "green",
@@ -72,22 +77,6 @@ const Products = ({ navigation }) => {
                         textAlign: 'center',
                         borderRadius: 5
                     }}>detail</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={(value) => delteProduct(item.id)}
-                    style={{ height: 50, width: 50, justifyContent: "center", alignItems: "center" }}
-                >
-                    <Text style={{
-                        color: "red",
-                        color: "white",
-                        justifyContent: "center",
-                        backgroundColor: "#ff0000",
-                        paddingVertical: 10,
-                        width: 50,
-                        textAlign: 'center',
-                        borderRadius: 5,
-                        marginLeft: 1,
-                    }}>delete</Text>
                 </TouchableOpacity>
             </View>
 
@@ -126,7 +115,7 @@ const styles = StyleSheet.create({
     info: {
         marginTop: 20,
         height: 10,
-        width: 150,
+        width: 190,
         justifyContent: "center",
         marginLeft: 10,
     },
@@ -140,4 +129,4 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default Products;
+export default Productclient;

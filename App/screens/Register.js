@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import { Text, TouchableWithoutFeedback, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import Constants from 'expo-constants';
 import axios from 'axios';
 import { createStackNavigator } from '@react-navigation/stack';
 
-export default function Register({ navigation }) {
+export default function Register({ navigation, route }) {
     const [user, setUser] = useState({
         login: '',
         password: '',
     });
 
-    const [loading, setLoading] = useState(false);
+
 
 
     const onChangeLogin = (value) => {
@@ -24,8 +24,7 @@ export default function Register({ navigation }) {
 
 
     const saveData = () => {
-        console.log("press");
-        console.log(user);
+
         fetch('http://192.168.100.200:5000/api/users', {
             method: 'POST',
             headers: {
@@ -38,7 +37,11 @@ export default function Register({ navigation }) {
                 setLoading(false)
                 response.text();
             })
-            .then((result) => console.log(result))
+            .then((result) => console.log(result),
+
+                navigation.replace('Login', {})
+
+            )
             .catch((error) => console.log(error));
     };
 
@@ -46,7 +49,7 @@ export default function Register({ navigation }) {
 
     return (
 
-        <View style={{ width: "100%", backgroundColor: "#e6ffe6", height: "100%", marginTop: 80, }}>
+        <View style={{ width: "100%", height: "100%", marginTop: 20, }}>
 
             <Text
                 style={{
@@ -61,76 +64,85 @@ export default function Register({ navigation }) {
                     fontSize: 30,
                     alignSelf: "center",
                 }}
-            >SignUp</Text>
+            >Sign Up</Text>
 
 
 
-            <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginHorizontal: 55,
-                borderWidth: 2,
-                marginTop: 50,
-                paddingHorizontal: 10,
-                borderColor: "#00716F",
-                borderRadius: 23,
-                paddingVertical: 2
-            }}>
-                <TextInput
-                    placeholder={'Login'}
-                    onChangeText={(value) => onChangeLogin(value)}
-                    style={{ paddingHorizontal: 10 }}
-                />
+
+            <TextInput
+                placeholder={'Login'}
+                onChangeText={(value) => onChangeLogin(value)}
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginHorizontal: 55,
+                    borderWidth: 2,
+                    marginTop: 15,
+                    paddingHorizontal: 10,
+                    borderColor: "#00716F",
+                    borderRadius: 23,
+                    paddingVertical: 10,
+                    paddingHorizontal: 10
+                }}
+            />
 
 
 
-            </View>
-            <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginHorizontal: 55,
-                borderWidth: 2,
-                marginTop: 15,
-                paddingHorizontal: 10,
-                borderColor: "#00716F",
-                borderRadius: 23,
-                paddingVertical: 2
-            }}>
-                <TextInput
-                    placeholder={'Password'}
-                    onChangeText={(value) => onChangePassword(value)}
-                    style={{ paddingHorizontal: 10 }}
-                />
+
+            <TextInput
+                placeholder={'Password'}
+                onChangeText={(value) => onChangePassword(value)}
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginHorizontal: 55,
+                    borderWidth: 2,
+                    marginTop: 15,
+                    paddingHorizontal: 10,
+                    borderColor: "#00716F",
+                    borderRadius: 23,
+                    paddingVertical: 10,
+                    paddingHorizontal: 10
+                }}
+            />
 
 
 
-            </View>
-            <TouchableOpacity>
-                <View style={{
+            <TouchableOpacity
+                onPress={saveData}
+            >
+
+                <Text style={{
+                    color: "white",
+                    color: "white",
+                    color: "white",
                     marginHorizontal: 55,
                     alignItems: "center",
                     justifyContent: "center",
                     marginTop: 30,
                     backgroundColor: "#00716F",
-                    paddingVertical: 10,
-                    borderRadius: 23
-                }}>
-                    <Text style={{
-                        color: "white",
-                    }}
-                        onPress={saveData}
-                    >SignUp</Text>
-                </View>
+                    paddingVertical: 20,
+                    borderRadius: 23,
+                    marginBottom: 31,
+                    textAlign: 'center',
+                }}
+
+                >Sign Up</Text>
+
             </TouchableOpacity>
 
             <Text
-
+                onPress={() =>
+                    navigation.replace('Login', {})
+                }
                 style={{
                     alignSelf: "center",
                     color: "#00716F",
                     paddingVertical: 30
-                }}>SignIn</Text>
+                }}>Sign In</Text>
         </View>
     )
 
 }
+
+
