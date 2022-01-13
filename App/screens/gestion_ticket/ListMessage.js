@@ -5,76 +5,66 @@ import {
     Text,
     StyleSheet,
     FlatList,
+    Image,
     TouchableOpacity,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // create a component
-const Products = ({ navigation }) => {
-    const [products, setProducts] = useState();
+const ListMessage = ({ navigation, route }) => {
+    const [messages, setmessages] = useState();
 
-    const getProductData = async () => {
-        fetch('http://192.168.100.200:5000/api/products')
+    const getMessageData = async () => {
+        fetch('http://192.168.100.222:8085/api/ticket/' + route.params.paramKey, {
+            method: 'GET',
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        })
             .then((response) => response.json())
-            .then((json) => setProducts(json))
+            .then((json) => {
+                setmessages(json.messages)
+                console.log(json)
+            }
+            )
             .catch((error) => console.error(error))
     };
 
-    const delteProduct = (value) => {
+    const deltemessage = (value) => {
         console.log(value);
-        fetch('http://192.168.100.200:5000/api/products/' + value, {
+        fetch('http://192.168.100.222:8085/api/message/' + value, {
             method: 'DELETE',
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(products),
         })
             .then((response) => {
                 response.text();
-
+                getMessageData();
             })
             .then((result) => console.log(result))
             .catch((error) => console.log(error));
-        getProductData();
+
     };
 
-
-    useState(() => {
-        getProductData();
+    useEffect(() => {
+        getMessageData();
     }, []);
+
 
     function Item({ item }) {
         return (
             <View style={styles.listItem}>
-                <View style={styles.column}>
-                    <Text style={{ fontWeight: "bold" }}>marque :</Text>
-                    <Text>description :</Text>
-                </View>
+
                 <View style={styles.info}>
-                    <Text style={{ fontWeight: "bold" }}>{item.marque}</Text>
-                    <Text>{item.description}</Text>
+                    <Text style={{ fontWeight: "bold" }}>{item.body}</Text>
+                    <Text>{item.date}</Text>
                 </View>
+
                 <TouchableOpacity
-                    onPress={() =>
-                        navigation.navigate('Details', {
-                            paramKey: item.id,
-                        })
-                    }
-                    style={{ height: 50, width: 50, justifyContent: "center", alignItems: "center", marginLeft: 0, }}
-                >
-                    <Text style={{
-                        color: "green",
-                        color: "white",
-                        justifyContent: "center",
-                        backgroundColor: "green",
-                        paddingVertical: 10,
-                        width: 50,
-                        textAlign: 'center',
-                        borderRadius: 5
-                    }}>detail</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={(value) => delteProduct(item.id)}
+                    onPress={(value) => deltemessage(item.id)}
                     style={{ height: 50, width: 50, justifyContent: "center", alignItems: "center" }}
                 >
                     <Text style={{
@@ -97,13 +87,37 @@ const Products = ({ navigation }) => {
 
     return (
 
+
         <View style={styles.container}>
-            <FlatList
-                data={products}
-                renderItem={({ item }) => <Item item={item} />}
-                keyExtractor={(item, index) => item + index.toString()}
-            />
+            <TouchableOpacity
+                onPress={() =>
+                    navigation.replace('AddMessage', {
+                        paramKey: route.params.paramKey,
+                    })
+                }
+            >
+
+                <Text style={{
+                    color: "white",
+                    justifyContent: "center",
+                    backgroundColor: "#00716F",
+                    paddingVertical: 20,
+                    textAlign: 'center',
+                    borderRadius: 5
+                }}
+
+                >Add Message</Text>
+
+            </TouchableOpacity>
+            <View >
+                <FlatList
+                    data={messages}
+                    renderItem={({ item }) => <Item item={item} />}
+                    keyExtractor={(item, index) => item + index.toString()}
+                />
+            </View>
         </View>
+
     );
 };
 
@@ -135,9 +149,14 @@ const styles = StyleSheet.create({
         height: 10,
         justifyContent: "center",
         marginLeft: 5,
+    },
+    tinyLogo: {
+        width: 70,
+        height: 60,
+        borderRadius: 5
     }
 
 });
 
 //make this component available to the app
-export default Products;
+export default ListMessage;

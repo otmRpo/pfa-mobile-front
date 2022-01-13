@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Text, TouchableWithoutFeedback, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
-import Constants from 'expo-constants';
-import axios from 'axios';
-import { createStackNavigator } from '@react-navigation/stack';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Register({ navigation, route }) {
+
+export default function LoginAdmin({ navigation, route }) {
     const [user, setUser] = useState({
         login: '',
         password: '',
-        email: '',
     });
+    let type = 0;
 
 
 
@@ -22,32 +21,41 @@ export default function Register({ navigation, route }) {
         setUser({ ...user, password: value });
     };
 
-    const onChangeEmail = (value) => {
-        setUser({ ...user, email: value });
-    };
+    const setObjectValue = async (v) => {
+        try {
+            let jsonValue = JSON.stringify(v);
+            await AsyncStorage.setItem('adminId', jsonValue);
+            console.log(jsonValue);
+        } catch (e) {
+            // save error
+        }
+
+    }
 
 
-
+    function json(response) {
+        return response.json()
+    }
     const saveData = () => {
-
-        fetch('http://192.168.100.222:8085/api/user/', {
+        fetch('http://192.168.100.222:8085/api/Admin/login', {
             method: 'POST',
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ login: user.login, password: user.password, email: user.email }),
+            body: JSON.stringify({ login: user.login, password: user.password }),
         })
-            .then((response) => {
-                setLoading(false)
-                response.text();
+            .then(json)
+            .then(function (json) {
+                console.log('request succeeded with json response', json.id)
+                setObjectValue(json.id)
+                if (json.id) {
+                    navigation.navigate('Gestion', {})
+                }
             })
-            .then((result) => console.log(result),
+            .catch((error) => console.log("error--" + error));
+        console.log(type);
 
-                navigation.replace('Login', {})
-
-            )
-            .catch((error) => console.log(error));
     };
 
 
@@ -62,14 +70,14 @@ export default function Register({ navigation, route }) {
                     fontSize: 20,
                     alignSelf: "center",
                 }}
-            >Are you a new user Then</Text>
+            >You have an account then</Text>
             <Text
                 style={{
                     marginTop: 50,
                     fontSize: 30,
                     alignSelf: "center",
                 }}
-            >Sign Up</Text>
+            >Sign In As Admin</Text>
 
 
 
@@ -94,25 +102,10 @@ export default function Register({ navigation, route }) {
 
 
 
+
             <TextInput
                 placeholder={'Password'}
                 onChangeText={(value) => onChangePassword(value)}
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginHorizontal: 55,
-                    borderWidth: 2,
-                    marginTop: 15,
-                    paddingHorizontal: 10,
-                    borderColor: "#00716F",
-                    borderRadius: 23,
-                    paddingVertical: 10,
-                    paddingHorizontal: 10
-                }}
-            />
-            <TextInput
-                placeholder={'Email'}
-                onChangeText={(value) => onChangeEmail(value)}
                 style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -133,8 +126,8 @@ export default function Register({ navigation, route }) {
                 onPress={saveData}
             >
 
+
                 <Text style={{
-                    color: "white",
                     color: "white",
                     color: "white",
                     marginHorizontal: 55,
@@ -148,22 +141,12 @@ export default function Register({ navigation, route }) {
                     textAlign: 'center',
                 }}
 
-                >Sign Up</Text>
+                >Sign In</Text>
 
             </TouchableOpacity>
 
-            <Text
-                onPress={() =>
-                    navigation.replace('Login', {})
-                }
-                style={{
-                    alignSelf: "center",
-                    color: "#00716F",
-                    paddingVertical: 30
-                }}>Sign In</Text>
+
         </View>
     )
 
 }
-
-

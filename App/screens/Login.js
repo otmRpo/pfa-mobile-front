@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'reac
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-export default function Register({ navigation, route }) {
+export default function Login({ navigation, route }) {
     const [user, setUser] = useState({
         login: '',
         password: '',
@@ -24,7 +24,7 @@ export default function Register({ navigation, route }) {
     const setObjectValue = async (v) => {
         try {
             let jsonValue = JSON.stringify(v);
-            await AsyncStorage.setItem('login', jsonValue);
+            await AsyncStorage.setItem('userId', jsonValue);
             console.log(jsonValue);
         } catch (e) {
             // save error
@@ -36,8 +36,8 @@ export default function Register({ navigation, route }) {
     function json(response) {
         return response.json()
     }
-    const saveData = () => {
-        fetch('http://192.168.100.200:5000/api/users/login', {
+    const saveData = async () => {
+        fetch('http://192.168.100.222:8085/api/user/login', {
             method: 'POST',
             headers: {
                 Accept: "application/json",
@@ -47,21 +47,14 @@ export default function Register({ navigation, route }) {
         })
             .then(json)
             .then(function (json) {
-                console.log('request succeeded with json response', json[0].id)
-                setObjectValue(json[0].id)
-                if (json[0].type === 1) {
-                    navigation.replace('Products', {})
-                } else {
-                    navigation.replace('ProductCreate', {})
-                };
+                console.log('request succeeded with json response', json.id)
+                setObjectValue(json.id)
+                if (json.id) {
+                    navigation.navigate('Gestion', {})
+                }
             })
             .catch((error) => console.log("error--" + error));
         console.log(type);
-
-
-
-
-
 
     };
 
